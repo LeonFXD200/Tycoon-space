@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Black Market Space Station Tycoon</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="stars" aria-hidden="true"></div>
+    <div class="scanlines" aria-hidden="true"></div>
+
+    <main class="game-shell">
+      <header class="hud">
+        <div class="brand-block">
+          <p class="eyebrow">NODE-13 WALKABOUT</p>
+          <h1>Black Market Space Station Tycoon</h1>
+        </div>
+
+        <section class="stats-strip" aria-label="Station resources">
+          <div class="stat-card credits">
+            <span>Credits</span>
+            <strong id="creditsStat">0</strong>
+          </div>
+          <div class="stat-card">
+            <span>Income</span>
+            <strong id="incomeStat">0/s</strong>
+          </div>
+          <div class="stat-card heat-card">
+            <span>Heat</span>
+            <strong id="heatStat">0</strong>
+            <small id="heatLevel">Low</small>
+          </div>
+          <div class="stat-card">
+            <span>Reputation</span>
+            <strong id="reputationStat">0</strong>
+          </div>
+          <div class="stat-card">
+            <span>Security</span>
+            <strong id="securityStat">0</strong>
+          </div>
+          <div class="stat-card">
+            <span>Power</span>
+            <strong id="powerStat">0 / 0</strong>
+          </div>
+          <div class="stat-card">
+            <span>Crew</span>
+            <strong id="crewStat">0 / 0</strong>
+          </div>
+          <div class="stat-card energy">
+            <span>Energy</span>
+            <strong id="energyStat">100 / 100</strong>
+          </div>
+        </section>
+      </header>
+
+      <section class="message-line" id="tutorialBanner" aria-live="polite">
+        <span id="tutorialText">The Docking Bay hatch is blinking. A freighter wants quiet fuel.</span>
+        <button id="dismissTutorial" type="button">Next</button>
+      </section>
+
+      <section class="play-layout">
+        <section class="play-area" aria-label="Top-down station game">
+          <canvas id="gameCanvas" width="960" height="640" tabindex="0"></canvas>
+          <div class="interaction-toast" id="interactionToast">
+            <span id="interactionTitle">Station Deck</span>
+            <strong id="interactionAction">Walk around NODE-13</strong>
+          </div>
+          <div class="alert-flash hidden" id="alertFlash">AUTHORITY SWEEP</div>
+        </section>
+
+        <aside class="side-panel">
+          <section class="panel-card context-card">
+            <p class="eyebrow">Nearby</p>
+            <h2 id="focusTitle">Central Deck</h2>
+            <p id="focusDescription">The station hums under your boots.</p>
+            <div class="context-actions">
+              <button id="primaryActionButton" type="button">Interact</button>
+              <button id="upgradeActionButton" type="button" class="ghost-button">Upgrade</button>
+            </div>
+            <div class="cooldown-line" id="cooldownLine"></div>
+          </section>
+
+          <section class="panel-card">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Build Terminal</p>
+                <h2>Station Rooms</h2>
+              </div>
+              <span class="terminal-state" id="terminalState">Out of range</span>
+            </div>
+            <div class="build-list" id="buildList"></div>
+          </section>
+
+          <section class="panel-card">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Galactic Whispers</p>
+                <h2>Log</h2>
+              </div>
+              <div class="risk-pill" id="raidRiskText">Quiet</div>
+            </div>
+            <div class="risk-bar" aria-hidden="true">
+              <div id="raidRiskFill"></div>
+            </div>
+            <p class="risk-copy" id="raidAdvice">Low Heat keeps patrols bored.</p>
+            <div id="eventLog" class="event-log" aria-live="polite"></div>
+          </section>
+        </aside>
+      </section>
+
+      <footer class="lower-deck">
+        <section>
+          <p class="eyebrow">Station Story</p>
+          <h2 id="storyTitle">Rusty Purchase</h2>
+          <p id="storyText">
+            You bought a battered station in deep space. The Docking Bay leaks fuel vapor,
+            but pilots still dock when they want a place that does not ask questions.
+          </p>
+        </section>
+
+        <section class="objectives" id="objectiveList" aria-label="Objectives"></section>
+
+        <section class="station-controls">
+          <button id="saveButton" type="button" class="ghost-button">Save</button>
+          <button id="resetButton" type="button" class="danger-button">Reset</button>
+        </section>
+      </footer>
+
+      <nav class="touch-controls" aria-label="Touch movement controls">
+        <button type="button" data-dir="up" class="dpad up">▲</button>
+        <button type="button" data-dir="left" class="dpad left">◀</button>
+        <button type="button" data-dir="down" class="dpad down">▼</button>
+        <button type="button" data-dir="right" class="dpad right">▶</button>
+        <button type="button" id="touchAction" class="touch-action">Act</button>
+      </nav>
+    </main>
+
+    <div class="modal-backdrop hidden" id="choiceModal" role="dialog" aria-modal="true" aria-labelledby="choiceTitle">
+      <section class="modal-card">
+        <p class="eyebrow" id="choiceEyebrow">Incoming Signal</p>
+        <h2 id="choiceTitle">A strange offer arrives</h2>
+        <p id="choiceText"></p>
+        <div class="choice-actions" id="choiceActions"></div>
+      </section>
+    </div>
+
+    <div class="modal-backdrop hidden" id="endingModal" role="dialog" aria-modal="true" aria-labelledby="endingTitle">
+      <section class="modal-card ending-card">
+        <p class="eyebrow">One Million Credits Reached</p>
+        <h2 id="endingTitle">Choose the fate of NODE-13</h2>
+        <p id="endingIntro">
+          The station is too famous to stay small. Traders, smugglers, and the Galactic
+          Authority are all watching your next move.
+        </p>
+        <div class="ending-options">
+          <button type="button" data-ending="legal">
+            <strong>Go Legal</strong>
+            License the docks and become a trade empire.
+          </button>
+          <button type="button" data-ending="criminal">
+            <strong>Stay Criminal</strong>
+            Rule the hidden lanes as the Shadow Dockmaster.
+          </button>
+          <button type="button" data-ending="sell">
+            <strong>Sell and Disappear</strong>
+            Cash out, wipe the logs, and vanish past the rim.
+          </button>
+        </div>
+        <p id="endingResult" class="ending-result"></p>
+        <button id="continueAfterEnding" type="button" class="ghost-button hidden">Continue Playing</button>
+      </section>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
